@@ -1,7 +1,9 @@
 package ru.library.services.people_service;
 
 import jakarta.transaction.Transactional;
+import ru.library.dto.BookDTO;
 import ru.library.dto.PersonDTO;
+import ru.library.models.Book;
 import ru.library.models.Person;
 
 import java.util.List;
@@ -24,4 +26,8 @@ public interface PeopleServiceInf {
 
     @Transactional
     List<Person> getDeletedPeople();
+
+    @Transactional
+    List<BookDTO> getBooksByPersonId(Long id);
+
 }

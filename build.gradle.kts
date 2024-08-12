@@ -37,6 +37,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.auth0/java-jwt
 	val jwtVersion = "4.4.0"
 	implementation("com.auth0:java-jwt:$jwtVersion")
+	// https://mvnrepository.com/artifact/jmimemagic/jmimemagic
+	implementation("jmimemagic:jmimemagic:0.1.2")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")

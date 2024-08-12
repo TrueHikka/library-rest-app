@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookDTO {
-    private Long id;
-    private String name;
+    private String title;
     private Integer yearOfProduction;
     private String author;
     private String annotation;
+    private String coverImageURL;
 }

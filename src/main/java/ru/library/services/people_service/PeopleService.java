@@ -4,10 +4,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.library.dto.BookDTO;
 import ru.library.dto.PersonDTO;
 import ru.library.exceptions.person_exp.PersonNotFoundException;
+import ru.library.models.Book;
 import ru.library.models.Person;
 import ru.library.repositories.PeopleRepository;
+import ru.library.services.book_service.BookService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,12 +19,14 @@ import java.util.Optional;
 @Service
 public class PeopleService implements PeopleServiceInf{
     private final PeopleRepository peopleRepository;
+    private final BookService bookService;
     private final ModelMapper modelMapper;
 //    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository, ModelMapper modelMapper) {
+    public PeopleService(PeopleRepository peopleRepository, BookService bookService, ModelMapper modelMapper) {
         this.peopleRepository = peopleRepository;
+        this.bookService = bookService;
         this.modelMapper = modelMapper;
 //        this.passwordEncoder = passwordEncoder;
     }
@@ -59,6 +64,19 @@ public class PeopleService implements PeopleServiceInf{
     @Override
     public List<Person> getDeletedPeople() {
         return peopleRepository.findByRemovedAtNotNull();
+    }
+
+
+    @Override
+    public List<BookDTO> getBooksByPersonId(Long id) {
+        Optional<Person> personById = peopleRepository.findById(id);
+        if (personById.isPresent()) {
+            return personById.get().getBooks().stream()
+                    .map(bookService::convertBookToBookDTO)
+                    .toList();
+        } else {
+            throw new RuntimeException("Person not found");
+        }
     }
 
     public PersonDTO convertPersonToPersonDTO(Person person) {

@@ -1,5 +1,6 @@
 package ru.library.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -23,16 +24,17 @@ public class Person {
     @NotEmpty(message = "Name is required")
     @Size(max=50, message="Name must be less than 50 characters")
     @Pattern(regexp = "^[A-Za-z]+ [A-Za-z]+ [A-Za-z]+$", message = "Name must contain full name (first, middle and last name)")
+//    @Pattern(regexp = "^[A-Za-z]+(?: [A-Za-z]+)?$", message = "Name must contain only first name or first and last name, with only letters allowed")
     @Column(name = "full_name")
     private String name;
 
-    @NotEmpty(message = "Age is required")
+    @NotNull(message = "Age is required")
     @Min(value = 10, message = "Age must be greater than 10")
     @Column(name = "age")
     private Integer age;
 
     @NotEmpty(message = "Email is required")
-    @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\\\.[a-z]{2,}$", message =
+    @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$", message =
     "Email should be valid")
     private String email;
 
@@ -61,6 +63,7 @@ public class Person {
     private String removedPerson;
 
     @OneToMany(mappedBy = "bookOwner", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Book> books;
 }
 

@@ -2,6 +2,7 @@ package ru.library.services.book_service;
 
 import jakarta.transaction.Transactional;
 import ru.library.models.Book;
+import ru.library.models.Person;
 
 import java.util.List;
 
@@ -19,11 +20,29 @@ public interface BookServiceInf {
     void update(Book book, Long bookId);
 
     @Transactional
-    void delete(Long id);
+    void softDeleteBook(Long bookId);
+
+    @Transactional
+    List<Book> getDeletedBooks();
+
+    @Transactional
+    byte[] getCoverImage(Long bookId);
+
+    @Transactional
+    List<String> getAllCoverImagesUrl();
 
     @Transactional
     void assignBookToPerson(Long bookId, Long personId);
 
     @Transactional
     void freeBook(Long bookId);
+
+    @Transactional
+    void viewBookCover(Long bookId, Long personId);
+
+    @Transactional
+    void viewBookContent(Long bookId, Long personId);
+
+    @Transactional
+    void releaseBookAfterViewing(Long bookId);
 }

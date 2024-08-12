@@ -1,22 +1,27 @@
 package ru.library.controllers;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import ru.library.dto.BookDTO;
 import ru.library.dto.PersonDTO;
 import ru.library.exceptions.person_exp.PersonErrorResponse;
 import ru.library.exceptions.person_exp.PersonNotCreatedException;
 import ru.library.exceptions.person_exp.PersonNotFoundException;
+import ru.library.models.Book;
 import ru.library.models.Person;
 import ru.library.services.people_service.PeopleService;
 import ru.library.services.people_service.PeopleServiceInf;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/people")
@@ -37,7 +42,8 @@ public class PeopleController {
     public List<PersonDTO> getAllPeople() {
         List<Person> allPeople = peopleServiceinf.getAllPeople();
 
-        return allPeople.stream().map(peopleService::convertPersonToPersonDTO)
+        return allPeople.stream()
+                .map(peopleService::convertPersonToPersonDTO)
                 .toList();
     }
 
@@ -71,18 +77,22 @@ public class PeopleController {
 
     }
 
-    @PostMapping("/update/{id}")
-    public ResponseEntity<PersonDTO> updatePerson(@PathVariable("id") Long id, @Valid PersonDTO personDTO, BindingResult result) {
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonDTO> updatePerson(@PathVariable("id") Long id, @RequestBody @Valid PersonDTO personDTO, BindingResult result) {
         if (result.hasErrors()) {
             StringBuilder errors = new StringBuilder();
 
             List<FieldError> fieldErrors = result.getFieldErrors();
 
-            for (FieldError fieldError : fieldErrors) {
+            for(FieldError fieldError : fieldErrors) {
                 errors.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append(";");
             }
 
             throw new PersonNotCreatedException(errors.toString());
+        }
+
+        if (peopleServiceinf.findPersonById(id) == null) {
+            throw new PersonNotFoundException("Person with id " + id + " not found");
         }
 
         Person person = peopleService.convertPersonDTOToPerson(personDTO);
@@ -106,6 +116,12 @@ public class PeopleController {
 
         return ResponseEntity.ok(deletedPeople.stream().map(peopleService::convertPersonToPersonDTO)
                 .toList());
+    }
+
+    @GetMapping("/personsBook/{id}")
+    public ResponseEntity<List<BookDTO>> getBooksByPersonId(@PathVariable("id") Long id) {
+        List<BookDTO> booksByPersonId = peopleServiceinf.getBooksByPersonId(id);
+        return ResponseEntity.ok(booksByPersonId);
     }
 
     @ExceptionHandler({PersonNotFoundException.class})

@@ -1,13 +1,12 @@
 package ru.library.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +22,7 @@ public class Book {
     private Long bookId;
 
     @NotEmpty(message = "Title should not be empty")
-    @Size(min = 2, max = 255, message = "Title should not be empty")
+    @Size(min = 2, max = 255, message = "Title must be between 2 and 50 symbols")
     @Column(name  = "title")
     private String title;
 
@@ -33,13 +32,22 @@ public class Book {
     private String author;
 
     @NotNull(message = "Year should not be null")
+    @Min(value = 1000, message = "Year must be at least 1000")
+    @Max(value = 9999, message = "Year must be a four-digit number")
     @Column(name  = "year_of_production")
-    @Pattern(regexp = "\\d{4}")
     private Integer yearOfProduction;
 
     @NotEmpty(message = "Description should not be empty")
+    @Length(max = 65535)
     @Column(name = "annotation")
     private String annotation;
+
+    @Column(name = "cover_image", columnDefinition = "bytea")
+    private byte[] coverImage;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private BookStatus status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -61,5 +69,6 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name="person_id", referencedColumnName = "id")
+    @JsonBackReference
     private Person bookOwner;
 }

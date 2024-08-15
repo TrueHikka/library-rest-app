@@ -48,7 +48,8 @@ public class Person {
     private String password;
 
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -2,7 +2,6 @@ package ru.library.services.book_service;
 
 import jakarta.transaction.Transactional;
 import ru.library.models.Book;
-import ru.library.models.Person;
 
 import java.util.List;
 

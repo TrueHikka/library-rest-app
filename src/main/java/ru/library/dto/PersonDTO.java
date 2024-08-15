@@ -3,6 +3,7 @@ package ru.library.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.library.models.Role;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +14,5 @@ public class PersonDTO {
     private String email;
     private String phoneNumber;
     private String password;
+    private Role role;
 }

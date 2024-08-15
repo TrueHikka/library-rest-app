@@ -1,11 +1,10 @@
 package ru.library.controllers;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +13,12 @@ import ru.library.dto.PersonDTO;
 import ru.library.exceptions.person_exp.PersonErrorResponse;
 import ru.library.exceptions.person_exp.PersonNotCreatedException;
 import ru.library.exceptions.person_exp.PersonNotFoundException;
-import ru.library.models.Book;
 import ru.library.models.Person;
 import ru.library.services.people_service.PeopleService;
 import ru.library.services.people_service.PeopleServiceInf;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/people")
@@ -38,6 +35,7 @@ public class PeopleController {
         this.peopleService = peopleService;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping()
     public List<PersonDTO> getAllPeople() {
         List<Person> allPeople = peopleServiceinf.getAllPeople();

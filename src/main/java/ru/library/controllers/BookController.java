@@ -16,7 +16,6 @@ import ru.library.exceptions.book_exp.BookNotCreatedException;
 import ru.library.exceptions.book_exp.BookNotFoundException;
 import ru.library.exceptions.img_exp.ImageErrorResponse;
 import ru.library.exceptions.img_exp.MalformedUrlException;
-import ru.library.exceptions.person_exp.PersonNotFoundException;
 import ru.library.models.Book;
 import ru.library.models.BookStatus;
 import ru.library.services.book_service.BookService;

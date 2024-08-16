@@ -2,7 +2,6 @@ package ru.library.controllers;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,14 +17,11 @@ import ru.library.models.Person;
 import ru.library.models.Role;
 import ru.library.security.PersonDetails;
 import ru.library.services.admin_service.AdminService;
-import ru.library.services.people_service.PeopleService;
 import ru.library.util.JWTUtil;
 import ru.library.validation.PersonValidator;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,16 +30,14 @@ public class AuthController {
 
     private final AdminService adminService;
     private final JWTUtil jwtUtil;
-    private final ModelMapper modelMapper;
     private final PersonValidator personValidator;
     private final AuthenticationManager authenticationManager;
 
 
     @Autowired
-    public AuthController(PeopleService peopleService, AdminService adminService, JWTUtil jwtUtil, ModelMapper modelMapper, PersonValidator personValidator, AuthenticationManager authenticationManager) {
+    public AuthController(AdminService adminService, JWTUtil jwtUtil, PersonValidator personValidator, AuthenticationManager authenticationManager) {
         this.adminService = adminService;
         this.jwtUtil = jwtUtil;
-        this.modelMapper = modelMapper;
         this.personValidator = personValidator;
         this.authenticationManager = authenticationManager;
     }
@@ -99,6 +93,5 @@ public class AuthController {
         PersonDetails principal = (PersonDetails) authentication.getPrincipal();
         return principal.getUsername();
     }
-
 }
 

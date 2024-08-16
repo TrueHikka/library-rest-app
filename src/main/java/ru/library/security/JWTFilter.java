@@ -47,9 +47,6 @@ public class JWTFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is empty");
             } else {
                 try {
-//                    String username = jwtUtil.validateTokenAndReturnUsername(token);
-//                    UserDetails userDetails = personDetailsService.loadUserByUsername(username);
-
                     DecodedJWT decodedJWT = jwtUtil.validateToken(token);
 
                     String username = decodedJWT.getClaim("username").asString();

@@ -6,12 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.library.dto.BookDTO;
 import ru.library.models.Book;
 import ru.library.models.BookStatus;
-import ru.library.models.Person;
 import ru.library.repositories.BookRepository;
-import ru.library.repositories.PeopleRepository;
 import ru.library.services.general_service.GeneralBookServiceInf;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

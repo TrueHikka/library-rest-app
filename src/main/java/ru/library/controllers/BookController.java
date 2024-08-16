@@ -30,19 +30,16 @@ import java.util.List;
 @RestController
 @RequestMapping("api/books")
 public class BookController {
-    private final BookServiceInf bookServiceInf;
     private final BookService bookService;
-//    private final PeopleServiceInf peopleServiceinf;
 
     @Autowired
-    public BookController(BookServiceInf bookServiceInf, BookService bookService) {
-        this.bookServiceInf = bookServiceInf;
+    public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
     @GetMapping()
     public List<BookDTO> getAllBooks() {
-        List<Book> allBooks = bookServiceInf.getAllBooks();
+        List<Book> allBooks = bookService.getAllBooks();
 
         return allBooks.stream()
                 .map(bookService::convertBookToBookDTO)
@@ -51,73 +48,73 @@ public class BookController {
 
     @GetMapping("/{id}")
     public BookDTO getBookById(@PathVariable("id") Long bookId) {
-        Book bookById = bookServiceInf.findBookById(bookId);
+        Book bookById = bookService.findBookById(bookId);
 
         return bookService.convertBookToBookDTO(bookById);
 
     }
 
-    @PostMapping()
-    public ResponseEntity<Book> createNewBook(@RequestBody @Valid BookDTO bookDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder errors = new StringBuilder();
-
-            List<FieldError> fieldErrors = result.getFieldErrors();
-
-            for (FieldError fieldError : fieldErrors) {
-                errors.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append(";");
-            }
-
-            throw new BookNotCreatedException(errors.toString());
-        }
-
-        Book book = bookService.convertBookDTOToBook(bookDTO);
-
-        try {
-            byte[] imageBytes = ImageUtil.downloadImage(bookDTO.getCoverImageURL());
-            book.setCoverImage(imageBytes);
-        } catch (MalformedUrlException | IOException e) {
-            throw new MalformedUrlException(e.getMessage());
-        }
-
-        book.setStatus(BookStatus.FREE);
-
-        bookService.save(book);
-
-        return ResponseEntity.ok(book);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable("id") Long bookId, @RequestBody @Valid BookDTO bookDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            StringBuilder errors = new StringBuilder();
-
-            List<FieldError> fieldErrors = result.getFieldErrors();
-
-            for (FieldError fieldError : fieldErrors) {
-                errors.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append(";");
-            }
-
-            throw new BookNotCreatedException(errors.toString());
-        }
-
-        if (bookServiceInf.findBookById(bookId) == null) {
-            throw new BookNotFoundException("Book with id " + bookId + " not found");
-        }
-
-        Book book = bookService.convertBookDTOToBook(bookDTO);
-
-        bookService.update(book, bookId);
-
-        BookDTO updatedBookDTO = bookService.convertBookToBookDTO(book);
-
-        return ResponseEntity.ok(updatedBookDTO);
-    }
+//    @PostMapping()
+//    public ResponseEntity<Book> createNewBook(@RequestBody @Valid BookDTO bookDTO, BindingResult result) {
+//        if (result.hasErrors()) {
+//            StringBuilder errors = new StringBuilder();
+//
+//            List<FieldError> fieldErrors = result.getFieldErrors();
+//
+//            for (FieldError fieldError : fieldErrors) {
+//                errors.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append(";");
+//            }
+//
+//            throw new BookNotCreatedException(errors.toString());
+//        }
+//
+//        Book book = bookService.convertBookDTOToBook(bookDTO);
+//
+//        try {
+//            byte[] imageBytes = ImageUtil.downloadImage(bookDTO.getCoverImageURL());
+//            book.setCoverImage(imageBytes);
+//        } catch (MalformedUrlException | IOException e) {
+//            throw new MalformedUrlException(e.getMessage());
+//        }
+//
+//        book.setStatus(BookStatus.FREE);
+//
+//        bookService.save(book);
+//
+//        return ResponseEntity.ok(book);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public ResponseEntity<BookDTO> updateBook(@PathVariable("id") Long bookId, @RequestBody @Valid BookDTO bookDTO, BindingResult result) {
+//        if (result.hasErrors()) {
+//            StringBuilder errors = new StringBuilder();
+//
+//            List<FieldError> fieldErrors = result.getFieldErrors();
+//
+//            for (FieldError fieldError : fieldErrors) {
+//                errors.append(fieldError.getField()).append(": ").append(fieldError.getDefaultMessage()).append(";");
+//            }
+//
+//            throw new BookNotCreatedException(errors.toString());
+//        }
+//
+//        if (bookServiceInf.findBookById(bookId) == null) {
+//            throw new BookNotFoundException("Book with id " + bookId + " not found");
+//        }
+//
+//        Book book = bookService.convertBookDTOToBook(bookDTO);
+//
+//        bookService.update(book, bookId);
+//
+//        BookDTO updatedBookDTO = bookService.convertBookToBookDTO(book);
+//
+//        return ResponseEntity.ok(updatedBookDTO);
+//    }
 
     @GetMapping("/{bookId}/coverImage")
     public ResponseEntity<byte[]> getCoverImage(@PathVariable("bookId") Long bookId, @RequestParam("personId") Long personId ) {
         try {
-            bookServiceInf.viewBookCover(bookId, personId);
+            bookService.viewBookCover(bookId, personId);
         } catch (IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage().getBytes());
         }
@@ -158,12 +155,12 @@ public class BookController {
     @GetMapping("/{bookId}/content")
     public ResponseEntity<?> getBookContent(@PathVariable("bookId") Long bookId, @RequestParam("personId") Long personId) {
         try {
-            bookServiceInf.viewBookContent(bookId, personId);
+            bookService.viewBookContent(bookId, personId);
         } catch (IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
 
-        Book book = bookServiceInf.findBookById(bookId);
+        Book book = bookService.findBookById(bookId);
 
         if (book == null) {
             return ResponseEntity.notFound().build();
@@ -183,65 +180,65 @@ public class BookController {
     @PutMapping("/{bookId}/releaseAfterViewing")
     public ResponseEntity<String> releaseBookAfterViewing(@PathVariable Long bookId) {
         try {
-            bookServiceInf.releaseBookAfterViewing(bookId);
+            bookService.releaseBookAfterViewing(bookId);
             return ResponseEntity.ok("Book released successfully");
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
     }
 
-    @PostMapping("/{id}/assign")
-    public ResponseEntity<String> assignBook(@PathVariable("id") Long bookId, @RequestParam("personId") Long personId) {
-        try {
-            bookServiceInf.assignBookToPerson(bookId, personId);
-            return ResponseEntity.ok("Book " + bookId + " assigned to person " + personId + " successfully");
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
-    }
+//    @PostMapping("/{id}/assign")
+//    public ResponseEntity<String> assignBook(@PathVariable("id") Long bookId, @RequestParam("personId") Long personId) {
+//        try {
+//            bookServiceInf.assignBookToPerson(bookId, personId);
+//            return ResponseEntity.ok("Book " + bookId + " assigned to person " + personId + " successfully");
+//        } catch (RuntimeException ex) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+//        }
+//    }
 
     @PostMapping("/{id}/free")
     public ResponseEntity<String> freeBook(@PathVariable("id") Long bookId) {
         try {
-            bookServiceInf.freeBook(bookId);
+            bookService.freeBook(bookId);
             return ResponseEntity.ok("Book " + bookId + " free successfully");
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
     }
 
-    @PostMapping("/delete/{bookId}")
-    public ResponseEntity<Void> softDeleteBook(@PathVariable Long bookId) {
-        bookService.softDeleteBook(bookId);
-        return ResponseEntity.noContent().build();
-    }
+//    @PostMapping("/delete/{bookId}")
+//    public ResponseEntity<Void> softDeleteBook(@PathVariable Long bookId) {
+//        bookService.softDeleteBook(bookId);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @GetMapping("/deleted")
+//    public ResponseEntity<List<BookDTO>> getDeletedBooks() {
+//        List<Book> deletedBooks = bookServiceInf.getDeletedBooks();
+//
+//        return ResponseEntity.ok(deletedBooks.stream().map(bookService::convertBookToBookDTO)
+//                .toList());
+//    }
 
-    @GetMapping("/deleted")
-    public ResponseEntity<List<BookDTO>> getDeletedBooks() {
-        List<Book> deletedBooks = bookServiceInf.getDeletedBooks();
-
-        return ResponseEntity.ok(deletedBooks.stream().map(bookService::convertBookToBookDTO)
-                .toList());
-    }
-
-    @ExceptionHandler({BookNotCreatedException.class})
-    public ResponseEntity<BookErrorResponse> handleBookNotCreatedException(BookNotCreatedException ex) {
-        BookErrorResponse errorResponse = new BookErrorResponse(
-                ex.getMessage(),
-                new Date()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({BookNotFoundException.class})
-    public ResponseEntity<BookErrorResponse> handleException(BookNotFoundException ex) {
-        BookErrorResponse response = new BookErrorResponse(
-                ex.getMessage(), new Date()
-        );
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
+//    @ExceptionHandler({BookNotCreatedException.class})
+//    public ResponseEntity<BookErrorResponse> handleBookNotCreatedException(BookNotCreatedException ex) {
+//        BookErrorResponse errorResponse = new BookErrorResponse(
+//                ex.getMessage(),
+//                new Date()
+//        );
+//
+//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//    }
+//
+//    @ExceptionHandler({BookNotFoundException.class})
+//    public ResponseEntity<BookErrorResponse> handleException(BookNotFoundException ex) {
+//        BookErrorResponse response = new BookErrorResponse(
+//                ex.getMessage(), new Date()
+//        );
+//
+//        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+//    }
 
     @ExceptionHandler({MalformedURLException.class})
     public ResponseEntity<ImageErrorResponse> handleMalformedURLException(MalformedURLException ex) {

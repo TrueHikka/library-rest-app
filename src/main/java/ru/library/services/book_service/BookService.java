@@ -9,6 +9,7 @@ import ru.library.models.BookStatus;
 import ru.library.models.Person;
 import ru.library.repositories.BookRepository;
 import ru.library.repositories.PeopleRepository;
+import ru.library.services.general_service.GeneralBookServiceInf;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,15 +17,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BookService implements BookServiceInf{
+public class BookService implements GeneralBookServiceInf {
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
-    private final PeopleRepository peopleRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, PeopleRepository peopleRepository, ModelMapper modelMapper) {
+    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
-        this.peopleRepository = peopleRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -37,11 +36,6 @@ public class BookService implements BookServiceInf{
     public Book findBookById(Long bookId) {
         Optional<Book> bookById = bookRepository.findById(bookId);
         return bookById.orElse(null);
-    }
-
-    @Override
-    public void save(Book book) {
-        bookRepository.save(book);
     }
 
     @Override
@@ -67,60 +61,8 @@ public class BookService implements BookServiceInf{
         return imageUrls;
     }
 
-    @Override
-    public void update(Book book, Long bookId) {
-        book.setBookId(bookId);
-        bookRepository.save(book);
-    }
-
-    @Override
-    public void softDeleteBook(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
-        book.setRemovedAt(LocalDateTime.now());
-        bookRepository.save(book);
-    }
-
-    @Override
-    public List<Book> getDeletedBooks() {
-        return bookRepository.findByRemovedAtNotNull();
-    }
-
     public BookDTO convertBookToBookDTO(Book book){
         return modelMapper.map(book, BookDTO.class);
-
-    }
-
-    public Book convertBookDTOToBook(BookDTO bookDTO){
-        Book book = modelMapper.map(bookDTO, Book.class);
-        enrichBook(book);
-        return book;
-    }
-
-    private void enrichBook(Book book){
-        book.setCreatedAt(LocalDateTime.now());
-        book.setUpdatedAt(LocalDateTime.now());
-        book.setRemovedAt(null);
-        book.setCreatedPerson("ADMIN");
-        book.setUpdatedPerson("ADMIN");
-        book.setRemovedPerson(null);
-        book.setBookOwner(null);
-    }
-
-    @Override
-    public void assignBookToPerson(Long bookId, Long personId) {
-        Book bookById = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
-        Person personById  = peopleRepository.findById(personId).orElseThrow(() -> new RuntimeException("Person not found"));
-
-        if (bookById.getStatus() != BookStatus.FREE) {
-            throw new IllegalStateException("Book is already assigned to a person");
-        }
-
-        bookById.setStatus(BookStatus.ASSIGNED);
-        bookById.setBookOwner(personById);
-        personById.getBooks().add(bookById);
-
-        bookRepository.save(bookById);
-        peopleRepository.save(personById);
     }
 
     @Override

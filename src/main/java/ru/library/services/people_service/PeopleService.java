@@ -8,16 +8,15 @@ import ru.library.dto.BookDTO;
 import ru.library.dto.PersonDTO;
 import ru.library.exceptions.person_exp.PersonNotFoundException;
 import ru.library.models.Person;
-import ru.library.models.Role;
 import ru.library.repositories.PeopleRepository;
 import ru.library.services.book_service.BookService;
+import ru.library.services.general_service.GeneralPeopleServiceInf;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PeopleService implements PeopleServiceInf{
+public class PeopleService implements GeneralPeopleServiceInf {
     private final PeopleRepository peopleRepository;
     private final BookService bookService;
     private final ModelMapper modelMapper;
@@ -43,32 +42,32 @@ public class PeopleService implements PeopleServiceInf{
         return personById.orElseThrow(() -> new PersonNotFoundException("Person with this id is not found"));
     }
 
-    @Override
-    public void save(Person person) {
-        if (person.getRole() == null) {
-            person.setRole(Role.ROLE_USER);
-        }
+//    @Override
+//    public void save(Person person) {
+//        if (person.getRole() == null) {
+//            person.setRole(Role.ROLE_USER);
+//        }
+//
+//        peopleRepository.save(person);
+//    }
 
-        peopleRepository.save(person);
-    }
+//    @Override
+//    public void update(Person person, Long id) {
+//        person.setId(id);
+//        peopleRepository.save(person);
+//    }
 
-    @Override
-    public void update(Person person, Long id) {
-        person.setId(id);
-        peopleRepository.save(person);
-    }
+//    @Override
+//    public void softDeletePerson(Long id) {
+//        Person person = peopleRepository.findById(id).orElseThrow();
+//        person.setRemovedAt(LocalDateTime.now());
+//        peopleRepository.save(person);
+//    }
 
-    @Override
-    public void softDeletePerson(Long id) {
-        Person person = peopleRepository.findById(id).orElseThrow();
-        person.setRemovedAt(LocalDateTime.now());
-        peopleRepository.save(person);
-    }
-
-    @Override
-    public List<Person> getDeletedPeople() {
-        return peopleRepository.findByRemovedAtNotNull();
-    }
+//    @Override
+//    public List<Person> getDeletedPeople() {
+//        return peopleRepository.findByRemovedAtNotNull();
+//    }
 
 
     @Override
@@ -87,21 +86,21 @@ public class PeopleService implements PeopleServiceInf{
         return modelMapper.map(person, PersonDTO.class);
     }
 
-    public Person convertPersonDTOToPerson(PersonDTO personDTO) {
-        Person person = modelMapper.map(personDTO, Person.class);
-
-        enrichPerson(person);
-
-        return person;
-    }
-
-    private void enrichPerson(Person person) {
-        person.setRole(person.getRole());
-        person.setCreatedAt(LocalDateTime.now());
-        person.setRemovedAt(null);
-        person.setCreatedPerson("ADMIN");
-        person.setRemovedPerson(null);
-        person.setPassword(passwordEncoder.encode(person.getPassword()));
-    }
+//    public Person convertPersonDTOToPerson(PersonDTO personDTO) {
+//        Person person = modelMapper.map(personDTO, Person.class);
+//
+//        enrichPerson(person);
+//
+//        return person;
+//    }
+//
+//    public void enrichPerson(Person person) {
+//        person.setRole(person.getRole());
+//        person.setCreatedAt(LocalDateTime.now());
+//        person.setRemovedAt(null);
+//        person.setCreatedPerson("ADMIN");
+//        person.setRemovedPerson(null);
+//        person.setPassword(passwordEncoder.encode(person.getPassword()));
+//    }
 
 }

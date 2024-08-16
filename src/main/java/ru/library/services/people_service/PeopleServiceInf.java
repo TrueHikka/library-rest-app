@@ -9,25 +9,25 @@ import ru.library.models.Person;
 import java.util.List;
 
 public interface PeopleServiceInf {
-    @Transactional
-    List<Person> getAllPeople();
+//    @Transactional
+//    List<Person> getAllPeople();
 
-    @Transactional
-    Person findPersonById(Long id);
+//    @Transactional
+//    Person findPersonById(Long id);
 
-    @Transactional
-    void save(Person person);
+//    @Transactional
+//    void save(Person person);
 
-    @Transactional
-    void update(Person person, Long id);
+//    @Transactional
+//    void update(Person person, Long id);
 
-    @Transactional
-    void softDeletePerson(Long id);
+//    @Transactional
+//    void softDeletePerson(Long id);
 
-    @Transactional
-    List<Person> getDeletedPeople();
+//    @Transactional
+//    List<Person> getDeletedPeople();
 
-    @Transactional
-    List<BookDTO> getBooksByPersonId(Long id);
+//    @Transactional
+//    List<BookDTO> getBooksByPersonId(Long id);
 
 }

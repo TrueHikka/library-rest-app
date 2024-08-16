@@ -17,6 +17,7 @@ import ru.library.dto.PersonDTO;
 import ru.library.models.Person;
 import ru.library.models.Role;
 import ru.library.security.PersonDetails;
+import ru.library.services.admin_service.AdminService;
 import ru.library.services.people_service.PeopleService;
 import ru.library.util.JWTUtil;
 import ru.library.validation.PersonValidator;
@@ -31,7 +32,7 @@ import java.util.Objects;
 @Slf4j
 public class AuthController {
 
-    private final PeopleService peopleService;
+    private final AdminService adminService;
     private final JWTUtil jwtUtil;
     private final ModelMapper modelMapper;
     private final PersonValidator personValidator;
@@ -39,8 +40,8 @@ public class AuthController {
 
 
     @Autowired
-    public AuthController(PeopleService peopleService, JWTUtil jwtUtil, ModelMapper modelMapper, PersonValidator personValidator, AuthenticationManager authenticationManager) {
-        this.peopleService = peopleService;
+    public AuthController(PeopleService peopleService, AdminService adminService, JWTUtil jwtUtil, ModelMapper modelMapper, PersonValidator personValidator, AuthenticationManager authenticationManager) {
+        this.adminService = adminService;
         this.jwtUtil = jwtUtil;
         this.modelMapper = modelMapper;
         this.personValidator = personValidator;
@@ -72,7 +73,7 @@ public class AuthController {
             personDTO.setRole(Role.ROLE_USER);
         }
 
-        Person person = peopleService.convertPersonDTOToPerson(personDTO);
+        Person person = adminService.convertPersonDTOToPerson(personDTO);
 
         personValidator.validate(person, bindingResult);
 
@@ -85,7 +86,7 @@ public class AuthController {
         }
 
 
-        peopleService.save(person);
+        adminService.save(person);
 
         String token = jwtUtil.generateToken(person.getName(), person.getRole());
 
